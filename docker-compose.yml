@@ -1,0 +1,58 @@
+# Secure File Vault — stack complète : MongoDB + backend (API chiffrée) + frontend (nginx)
+# Secrets lus depuis le fichier .env local (voir .env.example).
+# Limites mémoire volontaires : la machine héberge déjà Jenkins + SonarQube.
+services:
+  mongo:
+    image: mongo:7
+    container_name: sfv-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    mem_limit: 512m
+    networks:
+      - sfv
+
+  backend:
+    build: ./backend
+    image: lims4/secure-file-vault-backend:latest
+    container_name: sfv-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/secure-file-vault
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_EXPIRES_IN=1h
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - FILE_ENCRYPTION_KEY=${FILE_ENCRYPTION_KEY}
+      - UPLOAD_DIR=uploads
+      - MAX_FILE_SIZE_MB=10
+    volumes:
+      - uploads-data:/app/uploads
+    depends_on:
+      - mongo
+    mem_limit: 256m
+    networks:
+      - sfv
+
+  frontend:
+    build: ./frontend
+    image: lims4/secure-file-vault-frontend:latest
+    container_name: sfv-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    mem_limit: 128m
+    networks:
+      - sfv
+
+volumes:
+  mongo-data:
+  uploads-data:
+
+networks:
+  sfv:
+    driver: bridge

@@ -43,7 +43,7 @@ React (Vite + Tailwind) · Node.js + Express · MongoDB (Mongoose) · JWT · AES
 - [x] Backend — upload + chiffrement AES-256 + permissions
 - [x] Backend — audit log + routes admin
 - [x] Frontend React
-- [ ] Dockerfile + docker-compose
+- [x] Dockerfile + docker-compose
 - [ ] Jenkinsfile (stage Trivy) + SonarQube
 
 ## Démarrage (backend, Phase A)
@@ -71,6 +71,28 @@ Interface React (Vite + Tailwind, identité GitHub Primer) : page de connexion/i
 tableau de bord (drag & drop d'upload + liste avec gestion des permissions et téléchargement),
 et console d'administration (tous les fichiers + journal d'audit). Tokens JWT gérés côté
 client avec refresh automatique sur expiration.
+
+## Stack complète (Docker Compose, Phase E)
+
+```bash
+cp .env.example .env          # renseigner JWT_SECRET, JWT_REFRESH_SECRET, FILE_ENCRYPTION_KEY
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"   # clé AES-256
+docker compose up -d --build
+```
+
+| Service   | URL / Port              | Notes                                   |
+|-----------|-------------------------|-----------------------------------------|
+| Frontend  | http://localhost:3000   | nginx, proxy `/api` → backend           |
+| Backend   | interne `:5000`         | API chiffrée (non exposée à l'hôte)     |
+| MongoDB   | interne `:27017`        | volume `mongo-data`                      |
+
+Les fichiers uploadés (chiffrés) persistent dans le volume `uploads-data`.
+Les secrets ne sont jamais committés : ils proviennent du `.env` local.
+
+```bash
+docker compose down        # arrêt
+docker compose down -v     # arrêt + purge des volumes
+```
 
 ### Endpoints d'authentification
 
