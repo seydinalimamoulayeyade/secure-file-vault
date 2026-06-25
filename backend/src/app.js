@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth.routes');
+const filesRoutes = require('./routes/files.routes');
 const errorHandler = require('./middleware/error.middleware');
 
 const app = express();
@@ -29,6 +30,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/files', filesRoutes);
 
 // Route inconnue
 app.use((req, res) => {

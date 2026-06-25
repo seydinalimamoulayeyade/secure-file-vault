@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const ApiError = require('../utils/ApiError');
+const audit = require('../services/audit.service');
 const {
   signAccessToken,
   signRefreshToken,
@@ -24,6 +25,7 @@ const register = async (req, res, next) => {
       throw new ApiError(400, 'username, email et password sont requis');
     }
     const user = await User.create({ username, email, password });
+    await audit.record({ req, action: 'register', user });
     res.status(201).json({ status: 'success', data: user.toPublic() });
   } catch (err) {
     next(err);
@@ -47,6 +49,7 @@ const login = async (req, res, next) => {
     }
 
     const { accessToken, refreshToken } = await issueTokens(user);
+    await audit.record({ req, action: 'login', user });
     res.status(200).json({ status: 'success', accessToken, refreshToken, data: user.toPublic() });
   } catch (err) {
     next(err);
@@ -93,6 +96,7 @@ const logout = async (req, res, next) => {
         { $pull: { refreshTokens: tokenHash } }
       );
     }
+    await audit.record({ req, action: 'logout', user: req.user });
     res.status(200).json({ status: 'success', message: 'Déconnecté' });
   } catch (err) {
     next(err);

@@ -40,7 +40,7 @@ React (Vite + Tailwind) · Node.js + Express · MongoDB (Mongoose) · JWT · AES
 ## État d'avancement
 
 - [x] Backend — fondation + authentification (JWT + refresh + rôles)
-- [ ] Backend — upload + chiffrement AES-256 + permissions
+- [x] Backend — upload + chiffrement AES-256 + permissions
 - [ ] Backend — audit log + routes admin
 - [ ] Frontend React
 - [ ] Dockerfile + docker-compose
@@ -68,3 +68,14 @@ Nécessite une instance MongoDB accessible via `MONGODB_URI`.
 | POST    | `/api/auth/refresh`  | Rotation du refresh token            |
 | POST    | `/api/auth/logout`   | Révoque le refresh token (protégé)   |
 | GET     | `/api/auth/me`       | Profil courant (protégé)             |
+
+### Endpoints fichiers (protégés sauf partage)
+
+| Méthode | Route                          | Description                               |
+|---------|--------------------------------|-------------------------------------------|
+| POST    | `/api/files`                   | Upload (multipart `file`) → chiffré AES‑256 |
+| GET     | `/api/files`                   | Liste les fichiers visibles               |
+| GET     | `/api/files/:id/download`      | Télécharge (déchiffré à la volée)         |
+| PATCH   | `/api/files/:id/permission`    | Change la visibilité (private/shared/public) |
+| DELETE  | `/api/files/:id`               | Supprime (owner ou admin)                 |
+| GET     | `/api/files/shared/:token`     | Téléchargement via lien partagé (public)  |
