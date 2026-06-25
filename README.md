@@ -41,7 +41,7 @@ React (Vite + Tailwind) · Node.js + Express · MongoDB (Mongoose) · JWT · AES
 
 - [x] Backend — fondation + authentification (JWT + refresh + rôles)
 - [x] Backend — upload + chiffrement AES-256 + permissions
-- [ ] Backend — audit log + routes admin
+- [x] Backend — audit log + routes admin
 - [ ] Frontend React
 - [ ] Dockerfile + docker-compose
 - [ ] Jenkinsfile (stage Trivy) + SonarQube
@@ -79,3 +79,11 @@ Nécessite une instance MongoDB accessible via `MONGODB_URI`.
 | PATCH   | `/api/files/:id/permission`    | Change la visibilité (private/shared/public) |
 | DELETE  | `/api/files/:id`               | Supprime (owner ou admin)                 |
 | GET     | `/api/files/shared/:token`     | Téléchargement via lien partagé (public)  |
+
+### Endpoints admin (rôle admin requis)
+
+| Méthode | Route                | Description                          |
+|---------|----------------------|--------------------------------------|
+| GET     | `/api/admin/files`   | Tous les fichiers (paginé)           |
+| GET     | `/api/admin/users`   | Liste des utilisateurs               |
+| GET     | `/api/admin/audit`   | Journal d'audit (filtres action/user)|
