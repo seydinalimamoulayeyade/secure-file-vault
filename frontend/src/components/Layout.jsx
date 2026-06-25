@@ -1,0 +1,88 @@
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom'
+import Logo from './Logo'
+import { useAuth } from '../context/AuthContext'
+
+const navLinkClass = ({ isActive }) =>
+  `pb-[22px] pt-[22px] transition-colors ${
+    isActive ? 'font-medium text-gh-fg border-b-2 border-brand' : 'text-gh-fg-muted hover:text-gh-fg'
+  }`
+
+const Layout = () => {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login', { replace: true })
+  }
+
+  return (
+    <div className="min-h-screen bg-gh-canvas text-gh-fg flex flex-col">
+      {/* Barre de navigation */}
+      <header className="bg-gh-header border-b border-gh-border">
+        <div className="max-w-changelog mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-16 gap-6">
+            <Link to="/" className="flex items-center">
+              <Logo size={30} />
+            </Link>
+            <nav className="hidden md:flex items-center gap-6 text-sm ml-4">
+              <NavLink to="/" end className={navLinkClass}>Mes fichiers</NavLink>
+              {user?.role === 'admin' && (
+                <NavLink to="/admin" className={navLinkClass}>Administration</NavLink>
+              )}
+            </nav>
+            <div className="ml-auto flex items-center gap-3">
+              <div className="flex items-center gap-2 pl-1">
+                {user?.username && (
+                  <span className="hidden sm:inline gh-mono-label text-xs text-gh-fg-muted">{user.username}</span>
+                )}
+                {user?.role === 'admin' && (
+                  <span className="gh-mono-label text-[10px] px-2 py-0.5 rounded-full bg-gh-accent-subtle text-gh-accent">
+                    admin
+                  </span>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 text-sm font-medium rounded-md border border-gh-border text-gh-fg-muted hover:text-gh-fg hover:bg-gh-elevated transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* En-tête héro avec grille */}
+      <div className="gh-grid border-b border-gh-border">
+        <div className="max-w-changelog mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12">
+          <p className="gh-mono-label text-xs text-gh-fg-muted mb-6">Coffre-fort chiffré · DevSecOps</p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight">
+              <span className="text-gh-fg">Secure File</span>
+              <span className="bg-gradient-to-r from-brand to-brand-cyan bg-clip-text text-transparent"> Vault</span>
+            </h1>
+            <p className="gh-mono-label text-xs text-gh-fg-subtle">AES‑256 · JWT · Trivy</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contenu principal */}
+      <main className="flex-1 max-w-changelog mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <Outlet />
+      </main>
+
+      {/* Pied de page */}
+      <footer className="border-t border-gh-border mt-auto">
+        <div className="max-w-changelog mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center gap-3">
+          <Logo size={20} withText={false} />
+          <p className="gh-mono-label text-xs text-gh-fg-muted">
+            Secure File Vault — Chiffrement AES‑256 au repos
+          </p>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+export default Layout

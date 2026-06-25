@@ -42,7 +42,7 @@ React (Vite + Tailwind) · Node.js + Express · MongoDB (Mongoose) · JWT · AES
 - [x] Backend — fondation + authentification (JWT + refresh + rôles)
 - [x] Backend — upload + chiffrement AES-256 + permissions
 - [x] Backend — audit log + routes admin
-- [ ] Frontend React
+- [x] Frontend React
 - [ ] Dockerfile + docker-compose
 - [ ] Jenkinsfile (stage Trivy) + SonarQube
 
@@ -58,6 +58,19 @@ npm run dev   # http://localhost:5000
 ```
 
 Nécessite une instance MongoDB accessible via `MONGODB_URI`.
+
+## Démarrage (frontend, Phase D)
+
+```bash
+cd frontend
+npm install
+npm run dev   # http://localhost:3000 (proxy /api → :5000)
+```
+
+Interface React (Vite + Tailwind, identité GitHub Primer) : page de connexion/inscription,
+tableau de bord (drag & drop d'upload + liste avec gestion des permissions et téléchargement),
+et console d'administration (tous les fichiers + journal d'audit). Tokens JWT gérés côté
+client avec refresh automatique sur expiration.
 
 ### Endpoints d'authentification
 
