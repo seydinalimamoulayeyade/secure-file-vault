@@ -44,7 +44,7 @@ React (Vite + Tailwind) · Node.js + Express · MongoDB (Mongoose) · JWT · AES
 - [x] Backend — audit log + routes admin
 - [x] Frontend React
 - [x] Dockerfile + docker-compose
-- [ ] Jenkinsfile (stage Trivy) + SonarQube
+- [x] Jenkinsfile (stage Trivy) + SonarQube
 
 ## Démarrage (backend, Phase A)
 
@@ -93,6 +93,17 @@ Les secrets ne sont jamais committés : ils proviennent du `.env` local.
 docker compose down        # arrêt
 docker compose down -v     # arrêt + purge des volumes
 ```
+
+## Pipeline CI/CD (Jenkinsfile, Phase F)
+
+9 étapes : `Checkout → Install → Test → Sonar → Quality Gate → Docker Build → Trivy Scan → Docker Push → Deploy`.
+
+Le stage **Trivy** scanne les images backend et frontend :
+- vulnérabilité **CRITICAL** → échec du pipeline (`--exit-code 1`)
+- vulnérabilité **HIGH** → rapport informatif (archivé comme artefact `trivy-report.txt`)
+
+Réutilise l'infra CI existante (Jenkins + SonarQube du Deploy Board) et reporte le
+résultat de déploiement au Deploy Board via `x-deploy-token`.
 
 ### Endpoints d'authentification
 
